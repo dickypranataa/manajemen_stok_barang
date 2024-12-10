@@ -4,67 +4,86 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // Menampilkan semua pengguna
+    // Menampilkan daftar semua user
     public function index()
     {
+        // Mengambil semua user dari database
         $users = User::all();
-        return view('users.index', compact('users')); // Mengirim data ke view 'users.index'
+        return view('users.index', compact('users'));
     }
 
-    // Menampilkan form untuk membuat pengguna baru
+    // Menampilkan form untuk membuat user baru
     public function create()
     {
-        return view('users.create'); // Mengembalikan tampilan 'create.blade.php'
+        return view('users.create');
     }
 
-    // Menambahkan pengguna baru
+    // Menyimpan user baru ke database
     public function store(Request $request)
+{
+    // Validasi data input
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'password' => 'required|string|min:6',
+        'role' => 'required|in:admin,employee,vendor',
+    ]);
+
+    // Membuat user baru dan menyimpannya ke database
+    $user = new User();
+    $user->name = $request->name;
+    $user->password = Hash::make($request->password); // Enkripsi password
+    $user->role = $request->role;
+    $user->save();
+
+    // Redirect ke halaman daftar user dengan pesan sukses
+    return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan');
+}
+
+
+    // Menampilkan form untuk mengedit user
+    public function edit($id)
     {
-        // Validasi input dari request
-        $request->validate([
-            'username' => 'required|string|max:255|unique:users,username',
-            'password' => 'required|string|min:6',
-            'role' => 'required',
-            'tgl_buat' => 'required|date',
-        ]);
-
-        // Membuat pengguna baru menggunakan model User
-        User::create([
-            'username' => $request->username,
-            'password' => bcrypt($request->password), // Meng-enkripsi password
-            'role' => $request->role,
-            'tgl_buat' => $request->tgl_buat,
-        ]);
-
-        // Mengarahkan kembali ke halaman index setelah berhasil membuat pengguna
-        return redirect()->route('users.index');
+        $user = User::findOrFail($id); // Mencari user berdasarkan ID
+        return view('users.edit', compact('user'));
     }
 
-    // Menampilkan data pengguna berdasarkan ID
-    public function show($id)
-    {
-        $user = User::findOrFail($id);
-        return view('users.show', compact('user')); // Mengirim data ke view 'users.show'
-    }
-
-    // Mengupdate pengguna
+    // Menyimpan perubahan user yang sudah diedit
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-        $user->update($request->all());
+        // Validasi data input
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'password' => 'nullable|string|min:6', // Password opsional
+            'role' => 'required|in:admin,employee',
+        ]);
 
-        return redirect()->route('users.index'); // Mengarahkan kembali ke halaman index
+        // Mencari user berdasarkan ID dan memperbarui data
+        $user = User::findOrFail($id);
+        $user->name = $request->name;
+
+        // Jika password diisi, perbarui password
+        if ($request->password) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->role = $request->role;
+        $user->save();
+
+        // Redirect ke halaman daftar user dengan pesan sukses
+        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui');
     }
 
-    // Menghapus pengguna
+    // Menghapus user
     public function destroy($id)
     {
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('users.index'); // Mengarahkan kembali ke halaman index
+        // Redirect ke halaman daftar user dengan pesan sukses
+        return redirect()->route('users.index')->with('success', 'User berhasil dihapus');
     }
 }

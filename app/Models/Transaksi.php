@@ -9,21 +9,14 @@ class Transaksi extends Model
 {
     use HasFactory;
 
-    // Nama tabel (opsional jika tabel mengikuti konvensi Laravel)
+    // Tentukan tabel yang digunakan
     protected $table = 'Transaksi';
 
-    // Primary key (opsional jika berbeda dari 'id')
+    // Tentukan primary key
     protected $primaryKey = 'id_transaksi';
 
-    // Non-incrementing or non-numeric primary key
-    public $incrementing = true;
-
-    // Tipe data primary key
-    protected $keyType = 'int';
-
-    // Kolom yang dapat diisi secara massal
+    // Tentukan kolom yang dapat diisi (fillable)
     protected $fillable = [
-        'id_transaksi',
         'id_barang',
         'tgl_transaksi',
         'user_id',
@@ -32,22 +25,15 @@ class Transaksi extends Model
         'tipe'
     ];
 
-    // Menonaktifkan timestamps jika tabel tidak memiliki kolom created_at dan updated_at
-    public $timestamps = false;
-
-    /**
-     * Relasi ke tabel Barang (Many-to-One)
-     */
+    // Definisikan relasi ke model Barang
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'id_barang', 'id_barang');
     }
 
-    /**
-     * Relasi ke tabel User (Many-to-One)
-     */
+    // Definisikan relasi ke model User
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

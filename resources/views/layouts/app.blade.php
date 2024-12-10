@@ -1,29 +1,26 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Stok Barang</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="container">
-        <!-- Navigasi -->
-        <nav>
-            <ul>
-                <li><a href="{{ route('users.index') }}">Daftar Pengguna</a></li>
-                <li><a href="{{ route('barang.index') }}">Barang</a></li>
-                <li><a href="{{ route('laporan.index') }}">Laporan</a></li>
-            </ul>
-        </nav>
-
-        <!-- Konten Halaman -->
-        <div class="content">
+<body class="bg-gray-100">
+    <div class="flex">
+        <!-- Sidebar -->
+        @include('layouts.sidebar')
+        
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
             @yield('content')
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
